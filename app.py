@@ -6,8 +6,8 @@ import numpy as np
 app = Flask(__name__)
 CORS(app)
 
-# Trained Model load karein
-model = tf.keras.models.load_model('har_model.h5')
+# Trained Model load karein (YAHAN BADALNA THA)
+model = tf.keras.models.load_model('har_model.h5', compile=False)
 
 @app.route('/')
 def home():
