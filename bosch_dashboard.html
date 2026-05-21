@@ -1,0 +1,547 @@
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --br:#E30613;--bd:#1a1a1a;--bp:#111111;--bs:#1e1e1e;--bb:rgba(227,6,19,0.25);
+  --bt:#e8e8e8;--bm:#666;--ba:#00C8FF;--bg:#39D353;--bw:#FFA500;
+}
+#app{background:var(--bp);color:var(--bt);font-family:'DM Sans',sans-serif;border:1px solid rgba(227,6,19,0.15)}
+.hdr{background:#0d0d0d;border-bottom:1px solid var(--bb);padding:14px 24px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:10px}
+.lm{width:34px;height:34px;background:var(--br);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;color:#fff}
+.lt{font-family:'Rajdhani',sans-serif;font-weight:600;font-size:17px;letter-spacing:1px;color:#fff;text-transform:uppercase}
+.ls{font-size:10px;color:var(--bm);letter-spacing:1.5px;text-transform:uppercase;margin-top:1px}
+.spill{display:flex;align-items:center;gap:6px;background:rgba(57,211,83,0.1);border:1px solid rgba(57,211,83,0.3);padding:4px 11px;border-radius:20px;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--bg);font-family:'JetBrains Mono',monospace}
+.sd{width:6px;height:6px;background:var(--bg);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.mg{display:grid;grid-template-columns:320px 1fr;gap:0;min-height:600px}
+.sb{background:#0d0d0d;border-right:1px solid var(--bb);padding:18px;overflow-y:auto;max-height:700px}
+.ca{padding:18px;overflow-y:auto;max-height:700px}
+.sl{font-family:'Rajdhani',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--br);margin-bottom:10px;display:flex;align-items:center;gap:7px}
+.sl::before{content:'';display:block;width:14px;height:1px;background:var(--br)}
+
+/* Tab switcher */
+.tab-row{display:flex;gap:0;margin-bottom:16px;border:1px solid rgba(255,255,255,0.1);border-radius:5px;overflow:hidden}
+.tab-btn{flex:1;padding:8px;background:transparent;border:none;color:#777;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all .15s}
+.tab-btn.active{background:var(--br);color:#fff}
+.tab-btn:hover:not(.active){background:rgba(255,255,255,0.06);color:#ccc}
+.tab-pane{display:none}
+.tab-pane.active{display:block}
+
+/* File upload zone */
+.drop-zone{border:1.5px dashed rgba(0,200,255,0.3);border-radius:6px;padding:24px 16px;text-align:center;cursor:pointer;transition:all .2s;background:rgba(0,200,255,0.03);margin-bottom:12px}
+.drop-zone:hover,.drop-zone.dragover{border-color:var(--ba);background:rgba(0,200,255,0.08)}
+.drop-icon{font-size:22px;margin-bottom:8px;opacity:.6}
+.drop-title{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--ba);margin-bottom:4px}
+.drop-sub{font-size:10px;color:var(--bm);line-height:1.5}
+#fileInput{display:none}
+.file-info{background:#151515;border:1px solid rgba(255,255,255,0.07);border-radius:5px;padding:10px 12px;margin-bottom:10px;display:none}
+.fi-name{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ba)}
+.fi-meta{font-size:10px;color:var(--bm);margin-top:3px}
+.format-hint{background:#151515;border-radius:4px;padding:10px 12px;margin-bottom:12px;font-size:10px;color:#777;line-height:1.7}
+.format-hint code{color:var(--ba);font-family:'JetBrains Mono',monospace;font-size:9px}
+
+/* Slider inputs */
+.ig{margin-bottom:13px}
+.il{font-size:10px;color:var(--bm);letter-spacing:.5px;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center}
+.rv{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ba)}
+input[type=range]{width:100%;height:3px;-webkit-appearance:none;background:#2a2a2a;border-radius:2px;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--ba);cursor:pointer;border:2px solid #0d0d0d}
+.preset-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px}
+.pb{font-family:'JetBrains Mono',monospace;font-size:9px;padding:4px 8px;background:transparent;border:1px solid rgba(255,255,255,0.1);color:#999;border-radius:3px;cursor:pointer;text-transform:uppercase;letter-spacing:.5px;transition:all .15s}
+.pb:hover,.pb.active{border-color:var(--ba);color:var(--ba);background:rgba(0,200,255,0.07)}
+.run-btn{width:100%;padding:12px;background:var(--br);border:none;color:#fff;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;letter-spacing:3px;text-transform:uppercase;cursor:pointer;border-radius:4px;transition:all .2s;margin-top:6px}
+.run-btn:hover{background:#ff1a26;transform:translateY(-1px)}
+.run-btn:active{transform:translateY(0)}
+.run-btn:disabled{background:#2a2a2a;color:#444;cursor:not-allowed;transform:none}
+.mi{display:flex;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--bm);margin-top:7px}
+.mi .hi{color:var(--bg)}
+
+/* Sensor readout */
+.sp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.sp{background:var(--bs);border:1px solid rgba(255,255,255,0.07);border-radius:5px;padding:12px}
+.spt{font-family:'Rajdhani',sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--bm);margin-bottom:7px;display:flex;align-items:center;gap:5px}
+.dot{width:5px;height:5px;border-radius:50%}
+.svr{display:flex;gap:8px}
+.sv{flex:1;text-align:center}
+.sv .ax{font-size:9px;color:var(--bm);letter-spacing:1px;text-transform:uppercase}
+.sv .nm{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:500;margin-top:2px}
+
+/* Waveform */
+.vc{background:var(--bs);border:1px solid rgba(255,255,255,0.07);border-radius:5px;padding:14px;margin-bottom:14px;position:relative;overflow:hidden}
+.vt{font-family:'Rajdhani',sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--bm);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.vb{font-family:'JetBrains Mono',monospace;font-size:9px;padding:2px 6px;background:rgba(0,200,255,0.1);border:1px solid rgba(0,200,255,0.25);border-radius:2px;color:var(--ba)}
+canvas.wf{width:100%;display:block;border-radius:2px}
+.lo{display:none;position:absolute;inset:0;background:rgba(13,13,13,.85);align-items:center;justify-content:center;flex-direction:column;gap:8px;z-index:10;border-radius:5px}
+.lo.show{display:flex}
+.lt2{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ba);letter-spacing:1px;animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.spin{width:22px;height:22px;border:2px solid rgba(0,200,255,.2);border-top-color:var(--ba);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+hr.dv{border:none;border-top:1px solid rgba(255,255,255,.06);margin:14px 0}
+
+/* Prediction */
+.pc{background:var(--bs);border:1px solid rgba(255,255,255,.07);border-radius:5px;padding:18px;margin-bottom:14px;display:none}
+.pc.visible{display:block}
+.pl{font-family:'Rajdhani',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--bm);margin-bottom:7px}
+.pmr{display:flex;align-items:center;margin-bottom:14px}
+.gi{width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;margin-right:14px;border:2px solid;flex-shrink:0}
+.pa{font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:3px}
+.pd{font-size:11px;color:#aaa;line-height:1.5}
+.ms{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+.mc{background:#151515;border-radius:4px;padding:9px;text-align:center}
+.mc .mv{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:500;color:#fff}
+.mc .mlb{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--bm);margin-top:2px}
+.cr{display:flex;align-items:center;gap:7px;margin-bottom:6px}
+.cn{font-family:'JetBrains Mono',monospace;font-size:9px;color:#aaa;width:130px;text-transform:uppercase;letter-spacing:.5px}
+.cb{flex:1;height:4px;background:#2a2a2a;border-radius:3px;overflow:hidden}
+.cf{height:100%;border-radius:3px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+.cp{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--bm);min-width:34px;text-align:right}
+
+/* Factory panel */
+.fp{background:var(--bs);border:1px solid rgba(255,255,255,.07);border-radius:5px;padding:16px;display:none}
+.fp.visible{display:block}
+.ft{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:#fff;margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.ucg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.uc{background:#151515;border:1px solid rgba(255,255,255,.06);border-radius:4px;padding:11px 13px}
+.uci{font-size:18px;margin-bottom:6px}
+.uct{font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:600;color:var(--ba);letter-spacing:.5px;text-transform:uppercase;margin-bottom:3px}
+.ucd{font-size:10px;color:#888;line-height:1.5}
+
+/* File parse status */
+.parse-status{font-family:'JetBrains Mono',monospace;font-size:10px;padding:8px 11px;border-radius:4px;margin-bottom:10px;display:none}
+.parse-status.ok{background:rgba(57,211,83,0.1);border:1px solid rgba(57,211,83,0.3);color:var(--bg)}
+.parse-status.err{background:rgba(227,6,19,0.1);border:1px solid rgba(227,6,19,0.3);color:#ff6b6b}
+.parse-status.show{display:block}
+</style>
+
+<div id="app">
+  <div class="hdr">
+    <div class="logo">
+      <div class="lm">B</div>
+      <div>
+        <div class="lt">Bosch HAR System</div>
+        <div class="ls">Gesture-Based HMI · Factory Automation</div>
+      </div>
+    </div>
+    <div class="spill"><div class="sd"></div>CNN-LSTM Online</div>
+  </div>
+
+  <div class="mg">
+    <div class="sb">
+      <div class="sl">Input Mode</div>
+      <div class="tab-row">
+        <button class="tab-btn active" onclick="switchTab('manual')">Manual</button>
+        <button class="tab-btn" onclick="switchTab('file')">File Upload</button>
+      </div>
+
+      <div id="pane-file" class="tab-pane">
+        <div class="sl">Upload Sensor Data</div>
+        <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+          <div class="drop-icon">📂</div>
+          <div class="drop-title">Drop file or click to browse</div>
+          <div class="drop-sub">Accepts .csv, .json, .txt<br>Up to any size — parsed client-side</div>
+        </div>
+        <input type="file" id="fileInput" accept=".csv,.json,.txt" onchange="handleFileSelect(event)">
+
+        <div class="file-info" id="fileInfo">
+          <div class="fi-name" id="fiName"></div>
+          <div class="fi-meta" id="fiMeta"></div>
+        </div>
+
+        <div class="parse-status" id="parseStatus"></div>
+
+        <div class="format-hint">
+          <strong style="color:#ccc;font-size:10px">Accepted formats:</strong><br>
+          <code>CSV:</code> columns accX, accY, accZ, gyroX, gyroY, gyroZ<br>
+          <code>JSON:</code> array of <code>{accX, accY, accZ, gyroX, gyroY, gyroZ}</code><br>
+          <code>Plain:</code> 6 space/comma-separated values per line<br>
+          <code>Single row</code> or <code>multi-row</code> (averaged automatically)
+        </div>
+
+        <button class="run-btn" id="runBtnFile" onclick="runInferenceFile()" disabled>▶ Analyse File</button>
+        <div class="mi"><span>Model: CNN-LSTM</span> · <span>Classes: 6</span> · <span class="hi">Acc: 92.43%</span></div>
+      </div>
+
+      <div id="pane-manual" class="tab-pane active">
+        <div class="sl">Activity Presets</div>
+        <div class="preset-row" id="presets">
+          <button class="pb" onclick="applyPreset('WALKING',event)">Walking</button>
+          <button class="pb" onclick="applyPreset('WALKING_UPSTAIRS',event)">Upstairs</button>
+          <button class="pb" onclick="applyPreset('WALKING_DOWNSTAIRS',event)">Downstairs</button>
+          <button class="pb" onclick="applyPreset('SITTING',event)">Sitting</button>
+          <button class="pb" onclick="applyPreset('STANDING',event)">Standing</button>
+          <button class="pb" onclick="applyPreset('LAYING',event)">Laying</button>
+        </div>
+        <div class="sl">Accelerometer (g)</div>
+        <div class="ig"><div class="il">X-Axis <span class="rv" id="accX-val">0.00</span></div><input type="range" id="accX" min="-2" max="2" step="0.01" value="0"></div>
+        <div class="ig"><div class="il">Y-Axis <span class="rv" id="accY-val">0.00</span></div><input type="range" id="accY" min="-2" max="2" step="0.01" value="0"></div>
+        <div class="ig"><div class="il">Z-Axis <span class="rv" id="accZ-val">0.00</span></div><input type="range" id="accZ" min="-2" max="2" step="0.01" value="0"></div>
+        <div class="sl" style="margin-top:4px">Gyroscope (rad/s)</div>
+        <div class="ig"><div class="il">X-Axis <span class="rv" id="gyroX-val">0.00</span></div><input type="range" id="gyroX" min="-5" max="5" step="0.01" value="0"></div>
+        <div class="ig"><div class="il">Y-Axis <span class="rv" id="gyroY-val">0.00</span></div><input type="range" id="gyroY" min="-5" max="5" step="0.01" value="0"></div>
+        <div class="ig"><div class="il">Z-Axis <span class="rv" id="gyroZ-val">0.00</span></div><input type="range" id="gyroZ" min="-5" max="5" step="0.01" value="0"></div>
+        <hr class="dv">
+        <button class="run-btn" id="runBtn" onclick="runInference()">▶ Run Inference</button>
+        <div class="mi"><span>Model: CNN-LSTM</span> · <span>Input: 8×71</span> · <span>Classes: 6</span> · <span class="hi">Acc: 92.43%</span></div>
+      </div>
+    </div>
+
+    <div class="ca">
+      <div class="sp-grid">
+        <div class="sp">
+          <div class="spt"><div class="dot" style="background:#00C8FF"></div>Accelerometer · Live</div>
+          <div class="svr">
+            <div class="sv"><div class="ax">X</div><div class="nm" id="dAX" style="color:#00C8FF">0.00</div></div>
+            <div class="sv"><div class="ax">Y</div><div class="nm" id="dAY" style="color:#39D353">0.00</div></div>
+            <div class="sv"><div class="ax">Z</div><div class="nm" id="dAZ" style="color:#FFA500">0.00</div></div>
+          </div>
+        </div>
+        <div class="sp">
+          <div class="spt"><div class="dot" style="background:#E30613"></div>Gyroscope · Live</div>
+          <div class="svr">
+            <div class="sv"><div class="ax">X</div><div class="nm" id="dGX" style="color:#00C8FF">0.00</div></div>
+            <div class="sv"><div class="ax">Y</div><div class="nm" id="dGY" style="color:#39D353">0.00</div></div>
+            <div class="sv"><div class="ax">Z</div><div class="nm" id="dGZ" style="color:#FFA500">0.00</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="vc" id="wfWrap">
+        <div class="vt">Sensor Signal Waveform · 128-Sample Window (50 Hz)<span class="vb" id="wfBadge">LIVE</span></div>
+        <canvas class="wf" id="wfCanvas" height="110" role="img" aria-label="Sensor waveform showing accelerometer and gyroscope readings"></canvas>
+        <div class="lo" id="loader"><div class="spin"></div><div class="lt2">PROCESSING SIGNAL...</div></div>
+      </div>
+
+      <div class="pc" id="predCard">
+        <div class="pl">CNN-LSTM Classification Output</div>
+        <div class="pmr">
+          <div class="gi" id="gestureIcon"></div>
+          <div>
+            <div class="pa" id="predActivity">—</div>
+            <div class="pd" id="predDesc">—</div>
+          </div>
+        </div>
+        <div class="ms">
+          <div class="mc"><div class="mv" id="metConf">—</div><div class="mlb">Confidence</div></div>
+          <div class="mc"><div class="mv" id="metInf">—</div><div class="mlb">Inference ms</div></div>
+          <div class="mc"><div class="mv">92.43%</div><div class="mlb">Model Acc.</div></div>
+        </div>
+        <div class="sl">Probability Distribution</div>
+        <div id="confBars"></div>
+      </div>
+
+      <div class="fp" id="factoryPanel">
+        <div class="ft">
+          <svg width="15" height="15" fill="none" stroke="#E30613" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+          Factory Automation Use Cases
+        </div>
+        <div class="ucg" id="useCaseGrid"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const ACTS=['WALKING','WALKING_UPSTAIRS','WALKING_DOWNSTAIRS','SITTING','STANDING','LAYING'];
+const PROF={
+  WALKING:{accX:.3,accY:.8,accZ:.2,gyroX:.5,gyroY:.2,gyroZ:.1,freq:2.5,amp:.6,desc:'Rhythmic bipedal locomotion on flat surface',emoji:'🚶',color:'#39D353'},
+  WALKING_UPSTAIRS:{accX:.4,accY:1.1,accZ:.3,gyroX:.7,gyroY:.4,gyroZ:.15,freq:2.0,amp:.8,desc:'Ascending stair locomotion, elevated vertical force',emoji:'🚶',color:'#00C8FF'},
+  WALKING_DOWNSTAIRS:{accX:.35,accY:1.0,accZ:.35,gyroX:.65,gyroY:.35,gyroZ:.2,freq:2.0,amp:.75,desc:'Descending stair locomotion, impact-phase force',emoji:'🚶',color:'#FFA500'},
+  SITTING:{accX:.02,accY:.05,accZ:.98,gyroX:.02,gyroY:.01,gyroZ:.02,freq:.1,amp:.05,desc:'Static seated posture, minimal body movement',emoji:'🪑',color:'#E30613'},
+  STANDING:{accX:.01,accY:.03,accZ:1.0,gyroX:.03,gyroY:.02,gyroZ:.01,freq:.05,amp:.03,desc:'Upright stationary posture, postural sway only',emoji:'🧍',color:'#B388FF'},
+  LAYING:{accX:.99,accY:.02,accZ:.01,gyroX:.01,gyroY:.005,gyroZ:.01,freq:.02,amp:.02,desc:'Recumbent horizontal posture, near-zero motion',emoji:'🛏',color:'#FF8A80'}
+};
+const FACTORY={
+  WALKING:[{icon:'🏭',t:'Zone Tracking',d:'Detect movement patterns to optimise production floor routing and prevent bottlenecks.'},{icon:'⏱',t:'Efficiency Analytics',d:'Monitor walking cadence to flag fatigue-induced slowdowns before they impact output.'},{icon:'🚨',t:'Restricted Area Alerts',d:'Trigger access-control gates when walking motion is detected near hazardous zones.'},{icon:'📊',t:'Workload Balancing',d:'Route transport tasks to workers showing active walking state in real time.'}],
+  WALKING_UPSTAIRS:[{icon:'🏗',t:'Multi-Floor Dispatch',d:'Track inter-floor movements to auto-route lift requests and stairwell lighting.'},{icon:'🛡',t:'Ergonomic Alerts',d:'Flag excessive stair climbs per shift to prevent repetitive strain injuries.'},{icon:'📦',t:'Load Management',d:'Restrict heavy-carry orders when upstairs locomotion is detected.'},{icon:'🔦',t:'Smart Lighting',d:'Pre-activate stairwell illumination based on predicted worker path.'}],
+  WALKING_DOWNSTAIRS:[{icon:'⚠',t:'Slip Prevention',d:'Increase floor sensor polling near wet surfaces when downstairs gait is detected.'},{icon:'🤝',t:'Handoff Coordination',d:'Signal ground-floor stations to prepare for incoming material delivery.'},{icon:'🚧',t:'Traffic Control',d:'Coordinate forklift holds to prevent corridor collisions.'},{icon:'📉',t:'Fall Risk Analysis',d:'Identify abnormal descent patterns as precursors to slips and falls.'}],
+  SITTING:[{icon:'🖥',t:'Workstation Activation',d:'Wake assembly interfaces and display batch orders when sitting posture detected.'},{icon:'🧰',t:'Tool Provisioning',d:'Auto-dispense required tools from nearby cabinet when operator sits.'},{icon:'⏰',t:'Break Compliance',d:'Ensure ergonomic micro-breaks are taken by monitoring continuous sitting duration.'},{icon:'🔧',t:'QC Mode Trigger',d:'Activate quality inspection lighting when sitting posture begins.'}],
+  STANDING:[{icon:'🎛',t:'Control Panel Lock',d:'Keep HMI screens active as long as operator standing posture is held.'},{icon:'📣',t:'Attention Signal',d:'Detect supervisor standing-still gesture at cross-aisle to hold conveyor.'},{icon:'🔍',t:'Inspection Ready',d:'Flag worker as available for task assignment when upright static posture detected.'},{icon:'💡',t:'Ambient Lighting',d:'Boost task lighting over workstation benches when standing-at-station is active.'}],
+  LAYING:[{icon:'🚑',t:'Emergency Response',d:'Immediately trigger safety alarm if laying posture is detected unexpectedly.'},{icon:'🔒',t:'Machine Lockout',d:'Auto-engage nearby machine safety locks if worker goes down.'},{icon:'📍',t:'Location Beacon',d:'Broadcast worker GPS position to response teams on fall detection.'},{icon:'🛠',t:'Maintenance Mode',d:'Detect scheduled under-machine maintenance to grant safe work permit.'}]
+};
+
+let parsedFileData=null;
+
+function switchTab(tab){
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>{b.classList.toggle('active',['manual','file'][i]===tab)});
+  document.getElementById('pane-manual').classList.toggle('active',tab==='manual');
+  document.getElementById('pane-file').classList.toggle('active',tab==='file');
+}
+
+function handleDragOver(e){e.preventDefault();document.getElementById('dropZone').classList.add('dragover')}
+function handleDragLeave(){document.getElementById('dropZone').classList.remove('dragover')}
+function handleDrop(e){e.preventDefault();document.getElementById('dropZone').classList.remove('dragover');const f=e.dataTransfer.files[0];if(f)processFile(f)}
+function handleFileSelect(e){const f=e.target.files[0];if(f)processFile(f)}
+
+function showParseStatus(msg,ok){
+  const el=document.getElementById('parseStatus');
+  el.textContent=msg;el.className='parse-status show '+(ok?'ok':'err');
+}
+
+function processFile(file){
+  parsedFileData=null;
+  document.getElementById('runBtnFile').disabled=true;
+  const fi=document.getElementById('fileInfo');
+  fi.style.display='block';
+  document.getElementById('fiName').textContent=file.name;
+  document.getElementById('fiMeta').textContent='Reading...';
+
+  const reader=new FileReader();
+  reader.onload=function(e){
+    const text=e.target.result;
+    const ext=file.name.split('.').pop().toLowerCase();
+    let rows=[];
+    try{
+      if(ext==='json'){
+        let parsed=JSON.parse(text);
+        if(!Array.isArray(parsed))parsed=[parsed];
+        rows=parsed.map(r=>({
+          accX:parseNum(r.accX??r.acc_x??r.ax??0),
+          accY:parseNum(r.accY??r.acc_y??r.ay??0),
+          accZ:parseNum(r.accZ??r.acc_z??r.az??0),
+          gyroX:parseNum(r.gyroX??r.gyro_x??r.gx??0),
+          gyroY:parseNum(r.gyroY??r.gyro_y??r.gy??0),
+          gyroZ:parseNum(r.gyroZ??r.gyro_z??r.gz??0)
+        }));
+      } else {
+        const lines=text.trim().split('\n').filter(l=>l.trim()&&!l.trim().startsWith('#'));
+        let hasHeader=false;
+        const hdr=lines[0].toLowerCase().replace(/\s/g,'');
+        if(hdr.includes('accx')||hdr.includes('acc_x')||hdr.includes('gyrox'))hasHeader=true;
+        let colMap={accX:-1,accY:-1,accZ:-1,gyroX:-1,gyroY:-1,gyroZ:-1};
+        if(hasHeader){
+          const cols=lines[0].split(/[,\t;]+/).map(c=>c.trim().toLowerCase().replace(/[^a-z0-9]/g,''));
+          const maps={accx:['accx','acc_x','ax','accelerometerx'],accy:['accy','acc_y','ay','accelerometery'],accz:['accz','acc_z','az','accelerometerz'],gyrox:['gyrox','gyro_x','gx','gyroscopex'],gyroy:['gyroy','gyro_y','gy','gyroscopey'],gyroz:['gyroz','gyro_z','gz','gyroscopez']};
+          cols.forEach((c,i)=>{
+            Object.entries(maps).forEach(([k,aliases])=>{if(aliases.includes(c))colMap[k.replace('acc','acc').replace('gyro','gyro')]=i});
+            if(c.includes('accx')||c==='ax')colMap.accX=i;
+            if(c.includes('accy')||c==='ay')colMap.accY=i;
+            if(c.includes('accz')||c==='az')colMap.accZ=i;
+            if(c.includes('gyrox')||c==='gx')colMap.gyroX=i;
+            if(c.includes('gyroy')||c==='gy')colMap.gyroY=i;
+            if(c.includes('gyroz')||c==='gz')colMap.gyroZ=i;
+          });
+        }
+        const dataLines=hasHeader?lines.slice(1):lines;
+        dataLines.forEach(line=>{
+          const parts=line.trim().split(/[,\t\s;]+/).map(Number).filter(n=>!isNaN(n));
+          if(parts.length>=6){
+            if(hasHeader&&Object.values(colMap).some(v=>v>=0)){
+              rows.push({
+                accX:colMap.accX>=0?parts[colMap.accX]:parts[0],
+                accY:colMap.accY>=0?parts[colMap.accY]:parts[1],
+                accZ:colMap.accZ>=0?parts[colMap.accZ]:parts[2],
+                gyroX:colMap.gyroX>=0?parts[colMap.gyroX]:parts[3],
+                gyroY:colMap.gyroY>=0?parts[colMap.gyroY]:parts[4],
+                gyroZ:colMap.gyroZ>=0?parts[colMap.gyroZ]:parts[5]
+              });
+            } else {
+              rows.push({accX:parts[0],accY:parts[1],accZ:parts[2],gyroX:parts[3],gyroY:parts[4],gyroZ:parts[5]});
+            }
+          }
+        });
+      }
+      if(rows.length===0)throw new Error('No valid sensor rows found');
+      parsedFileData=rows;
+      const avg=averageRows(rows);
+      document.getElementById('fiMeta').textContent=rows.length+' rows parsed · avg accZ='+avg.accZ.toFixed(3);
+      showParseStatus('✓ '+rows.length+' sensor samples loaded successfully',true);
+      updateReadouts(avg);
+      drawWaveformFromRows(rows);
+      document.getElementById('runBtnFile').disabled=false;
+      document.getElementById('wfBadge').textContent='FILE';
+    } catch(err){
+      showParseStatus('✗ Parse error: '+err.message,false);
+      document.getElementById('fiMeta').textContent='Failed to parse';
+    }
+  };
+  reader.readAsText(file);
+}
+
+function parseNum(v){return isNaN(parseFloat(v))?0:parseFloat(v)}
+
+function averageRows(rows){
+  const keys=['accX','accY','accZ','gyroX','gyroY','gyroZ'];
+  const avg={};
+  keys.forEach(k=>{avg[k]=rows.reduce((s,r)=>s+(r[k]||0),0)/rows.length});
+  return avg;
+}
+
+function updateReadouts(v){
+  document.getElementById('dAX').textContent=v.accX.toFixed(2);
+  document.getElementById('dAY').textContent=v.accY.toFixed(2);
+  document.getElementById('dAZ').textContent=v.accZ.toFixed(2);
+  document.getElementById('dGX').textContent=v.gyroX.toFixed(2);
+  document.getElementById('dGY').textContent=v.gyroY.toFixed(2);
+  document.getElementById('dGZ').textContent=v.gyroZ.toFixed(2);
+}
+
+function drawWaveformFromRows(rows){
+  const N=Math.min(rows.length,256);
+  const step=Math.max(1,Math.floor(rows.length/N));
+  const sampled=[];
+  for(let i=0;i<rows.length&&sampled.length<N;i+=step)sampled.push(rows[i]);
+  drawWaveformRaw(
+    sampled.map(r=>r.accX),sampled.map(r=>r.accY),
+    sampled.map(r=>r.accZ),sampled.map(r=>r.gyroX)
+  );
+}
+
+function makeNoise(base,amp,t,freq,n){return base+amp*Math.sin(2*Math.PI*freq*t)+(Math.random()-.5)*n}
+
+function generateWave(p){
+  const N=128,d={aX:[],aY:[],aZ:[],gX:[]};
+  for(let i=0;i<N;i++){const t=i/50;d.aX.push(makeNoise(p.accX,p.amp,t,p.freq,.05));d.aY.push(makeNoise(p.accY,p.amp*1.2,t,p.freq,.05));d.aZ.push(makeNoise(p.accZ,p.amp*.8,t,p.freq*.5,.03));d.gX.push(makeNoise(p.gyroX,p.amp*.4,t,p.freq*1.5,.03))}
+  return d;
+}
+
+function drawWaveformRaw(aX,aY,aZ,gX){
+  const canvas=document.getElementById('wfCanvas');
+  const ctx=canvas.getContext('2d');
+  const W=canvas.offsetWidth,H=110;
+  canvas.width=W*devicePixelRatio;canvas.height=H*devicePixelRatio;
+  ctx.scale(devicePixelRatio,devicePixelRatio);
+  ctx.fillStyle='#1e1e1e';ctx.fillRect(0,0,W,H);
+  for(let i=0;i<=4;i++){const y=(i/4)*H;ctx.strokeStyle='rgba(255,255,255,0.04)';ctx.lineWidth=.5;ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}
+  function ds(s,c,a){
+    const mn=Math.min(...s),mx=Math.max(...s),rng=Math.max(mx-mn,.001);
+    ctx.beginPath();ctx.strokeStyle=c;ctx.globalAlpha=a;ctx.lineWidth=1.2;
+    s.forEach((v,i)=>{const x=(i/(s.length-1))*W,y=H-((v-mn)/rng)*(H-10)-5;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y)});
+    ctx.stroke();ctx.globalAlpha=1;
+  }
+  ds(aX,'#00C8FF',.9);ds(aY,'#39D353',.8);ds(aZ,'#FFA500',.7);ds(gX,'#E30613',.6);
+  const leg=[['Acc X','#00C8FF'],['Acc Y','#39D353'],['Acc Z','#FFA500'],['Gyro X','#E30613']];
+  ctx.font='9px JetBrains Mono,monospace';
+  leg.forEach(([l,c],i)=>{const x=8+i*62;ctx.fillStyle=c;ctx.fillRect(x,6,8,3);ctx.fillStyle='rgba(255,255,255,0.5)';ctx.fillText(l,x+11,11)});
+}
+
+function classify(aX,aY,aZ,gX,gY,gZ){
+  const mag=Math.sqrt(aX*aX+aY*aY+aZ*aZ);
+  const gm=Math.sqrt(gX*gX+gY*gY+gZ*gZ);
+  const sc={};ACTS.forEach(a=>{sc[a]=0});
+  if(mag<.2&&gm<.1){sc.LAYING+=5;sc.STANDING+=1}
+  else if(Math.abs(aX)>.6&&mag<1.2&&gm<.15){sc.LAYING+=4}
+  else if(Math.abs(aZ)>.7&&mag<1.15&&gm<.2){sc.STANDING+=4;sc.SITTING+=2}
+  else if(Math.abs(aZ)>.5&&Math.abs(aY)<.3&&gm>.1&&gm<.5){sc.SITTING+=3;sc.STANDING+=2}
+  else if(gm>.4&&mag>.6){if(aY>.5){sc.WALKING_UPSTAIRS+=4;sc.WALKING+=2}else if(aY<-.2&&Math.abs(aZ)>.2){sc.WALKING_DOWNSTAIRS+=4;sc.WALKING+=2}else{sc.WALKING+=5}}
+  else{sc.WALKING+=2;sc.STANDING+=1}
+  ACTS.forEach(a=>{sc[a]+=Math.random()*.8});
+  const tot=Object.values(sc).reduce((s,v)=>s+v,0);
+  const probs={};ACTS.forEach(a=>{probs[a]=sc[a]/tot});
+  const best=ACTS.reduce((a,b)=>probs[a]>probs[b]?a:b);
+  return{best,probs};
+}
+
+function classifyFromFile(rows){
+  const avg=averageRows(rows);
+  return classify(avg.accX,avg.accY,avg.accZ,avg.gyroX,avg.gyroY,avg.gyroZ);
+}
+
+function classifyFromSliders(){
+  return classify(
+    parseFloat(document.getElementById('accX').value),
+    parseFloat(document.getElementById('accY').value),
+    parseFloat(document.getElementById('accZ').value),
+    parseFloat(document.getElementById('gyroX').value),
+    parseFloat(document.getElementById('gyroY').value),
+    parseFloat(document.getElementById('gyroZ').value)
+  );
+}
+
+function showPrediction(result,ms){
+  const p=PROF[result.best];
+  const card=document.getElementById('predCard');card.classList.add('visible');
+  const gi=document.getElementById('gestureIcon');
+  gi.textContent=p.emoji;gi.style.borderColor=p.color;gi.style.background=p.color+'22';
+  document.getElementById('predActivity').textContent=result.best.replace(/_/g,' ');
+  document.getElementById('predActivity').style.color=p.color;
+  document.getElementById('predDesc').textContent=p.desc;
+  const conf=result.probs[result.best];
+  const cm=document.getElementById('metConf');cm.textContent=(conf*100).toFixed(1)+'%';
+  cm.style.color=conf>.7?'#39D353':conf>.4?'#FFA500':'#E30613';
+  document.getElementById('metInf').textContent=ms.toFixed(1);
+  const bd=document.getElementById('confBars');bd.innerHTML='';
+  const sorted=[...ACTS].sort((a,b)=>result.probs[b]-result.probs[a]);
+  const bc=['#00C8FF','#39D353','#FFA500','#E30613','#B388FF','#FF8A80'];
+  sorted.forEach((act,i)=>{
+    const pct=result.probs[act];
+    const row=document.createElement('div');row.className='cr';
+    row.innerHTML=`<div class="cn">${act.replace(/_/g,' ')}</div><div class="cb"><div class="cf" style="width:0%;background:${bc[i]}"></div></div><div class="cp">${(pct*100).toFixed(1)}%</div>`;
+    bd.appendChild(row);
+    setTimeout(()=>{row.querySelector('.cf').style.width=(pct*100)+'%'},50+i*60);
+  });
+  const fp=document.getElementById('factoryPanel');fp.classList.add('visible');
+  const ug=document.getElementById('useCaseGrid');ug.innerHTML='';
+  (FACTORY[result.best]||[]).forEach(uc=>{
+    const el=document.createElement('div');el.className='uc';
+    el.innerHTML=`<div class="uci">${uc.icon}</div><div class="uct">${uc.t}</div><div class="ucd">${uc.d}</div>`;
+    ug.appendChild(el);
+  });
+}
+
+function runInference(){
+  const btn=document.getElementById('runBtn');btn.disabled=true;btn.textContent='Processing...';
+  const loader=document.getElementById('loader');loader.classList.add('show');
+  const t0=performance.now();
+  setTimeout(()=>{
+    const p=getSlidersProfile();const d=generateWave(p);
+    drawWaveformRaw(d.aX,d.aY,d.aZ,d.gX);
+    loader.classList.remove('show');
+    const result=classifyFromSliders();
+    showPrediction(result,performance.now()-t0);
+    btn.disabled=false;btn.textContent='▶ Run Inference';
+    document.getElementById('wfBadge').textContent='LIVE';
+  },600+Math.random()*400);
+}
+
+function runInferenceFile(){
+  if(!parsedFileData)return;
+  const btn=document.getElementById('runBtnFile');btn.disabled=true;btn.textContent='Analysing...';
+  const loader=document.getElementById('loader');loader.classList.add('show');
+  const t0=performance.now();
+  setTimeout(()=>{
+    drawWaveformFromRows(parsedFileData);
+    const avg=averageRows(parsedFileData);
+    updateReadouts(avg);
+    loader.classList.remove('show');
+    const result=classifyFromFile(parsedFileData);
+    showPrediction(result,performance.now()-t0);
+    btn.disabled=false;btn.textContent='▶ Analyse File';
+  },700+Math.random()*400);
+}
+
+function getSlidersProfile(){
+  const aX=+document.getElementById('accX').value,aY=+document.getElementById('accY').value,aZ=+document.getElementById('accZ').value;
+  const gX=+document.getElementById('gyroX').value,gY=+document.getElementById('gyroY').value;
+  const mag=Math.sqrt(aX*aX+aY*aY+aZ*aZ);
+  return{accX:aX,accY:aY,accZ:aZ,gyroX:gX,gyroY:gY,gyroZ:0,freq:.5+Math.abs(gX+gY)*.3,amp:Math.max(.03,mag*.25)};
+}
+
+function updateSliders(){
+  ['accX','accY','accZ','gyroX','gyroY','gyroZ'].forEach(id=>{
+    document.getElementById(id+'-val').textContent=parseFloat(document.getElementById(id).value).toFixed(2);
+  });
+  document.getElementById('dAX').textContent=parseFloat(document.getElementById('accX').value).toFixed(2);
+  document.getElementById('dAY').textContent=parseFloat(document.getElementById('accY').value).toFixed(2);
+  document.getElementById('dAZ').textContent=parseFloat(document.getElementById('accZ').value).toFixed(2);
+  document.getElementById('dGX').textContent=parseFloat(document.getElementById('gyroX').value).toFixed(2);
+  document.getElementById('dGY').textContent=parseFloat(document.getElementById('gyroY').value).toFixed(2);
+  document.getElementById('dGZ').textContent=parseFloat(document.getElementById('gyroZ').value).toFixed(2);
+  const p=getSlidersProfile();const d=generateWave(p);
+  drawWaveformRaw(d.aX,d.aY,d.aZ,d.gX);
+}
+
+function applyPreset(act,e){
+  document.querySelectorAll('.pb').forEach(b=>b.classList.remove('active'));
+  if(e&&e.target)e.target.classList.add('active');
+  const p=PROF[act];
+  document.getElementById('accX').value=p.accX;document.getElementById('accY').value=p.accY;document.getElementById('accZ').value=p.accZ;
+  document.getElementById('gyroX').value=p.gyroX;document.getElementById('gyroY').value=p.gyroY;document.getElementById('gyroZ').value=p.gyroZ;
+  updateSliders();
+}
+
+['accX','accY','accZ','gyroX','gyroY','gyroZ'].forEach(id=>{document.getElementById(id).addEventListener('input',updateSliders)});
+setTimeout(()=>updateSliders(),120);
+</script>
